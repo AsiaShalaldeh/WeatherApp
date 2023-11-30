@@ -21,8 +21,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Future<Weather> _fetchWeatherData() async {
     try {
-      final response = await WeatherService()
-          .fetchWeatherData(); // will be updated wo send city param
+      final response = await WeatherService().fetchWeatherData('London');
       return Weather.fromJson(response);
     } catch (e) {
       throw Exception('Failed to load weather data: $e');
@@ -34,8 +33,8 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-          // title: const Text('Weather App', style: TextStyle(color: Colors.black)),
-          ),
+        title: const Text('Weather App', style: TextStyle(color: Colors.black)),
+      ),
       body: FutureBuilder<Weather>(
         future: weatherData,
         builder: (context, snapshot) {
@@ -65,8 +64,8 @@ class _HomeScreenState extends State<HomeScreen> {
             style: const TextStyle(fontSize: 24.0),
           ),
           const SizedBox(height: 16.0),
-          Image.asset(
-            weather.getWeatherIcon(),
+          Image.network(
+            "http:${weather.icon}",
             height: 64.0,
             width: 64.0,
           ),

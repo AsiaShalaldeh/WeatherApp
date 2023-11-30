@@ -18,12 +18,11 @@ This Flutter Weather App is a mobile application designed to provide users with 
 # Getting Started
 1. Clone the repository:
 ```
-git clone https://github.com/yourusername/weather_app.git
+git clone https://github.com/AsiaShalaldeh/WeatherApp.git
 ```
 
-2. Follow the Flutter installation guide to set up Flutter on your machine.
-3. Obtain an API key from WeatherAPI and replace YOUR_API_KEY in the code with your actual API key.
-4. Run the app:
+2. Obtain an API key from WeatherAPI and replace YOUR_API_KEY in the code with your actual API key.
+3. Run the app:
 ```
 flutter run
 ```
