@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:weatherapp/screens/places_screen.dart';
 
 import '../models/weather.dart';
 import '../services/weather_service.dart';
@@ -34,6 +35,62 @@ class _HomeScreenState extends State<HomeScreen> {
       backgroundColor: Colors.white,
       appBar: AppBar(
         title: const Text('Weather App', style: TextStyle(color: Colors.black)),
+        leading: Builder(
+          builder: (BuildContext context) {
+            return IconButton(
+              onPressed: () {
+                Scaffold.of(context).openDrawer();
+              },
+              icon: const Icon(
+                Icons.menu,
+                color: Colors.black,
+              ),
+            );
+          },
+        ),
+      ),
+      drawer: Drawer(
+        child: ListView(
+          padding: EdgeInsets.zero,
+          children: <Widget>[
+            const DrawerHeader(
+                decoration: BoxDecoration(color: Colors.grey),
+                child: Text('Weather App',
+                    style: TextStyle(color: Colors.white, fontSize: 24))),
+            ListTile(
+              leading: const Icon(Icons.home, color: Colors.grey),
+              title: const Text('Home'),
+              onTap: () {
+                Navigator.pop(context);
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const HomeScreen()));
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.access_time, color: Colors.grey),
+              title: const Text('Hourly Forecast'),
+              onTap: () {},
+            ),
+            ListTile(
+              leading: const Icon(Icons.calendar_today, color: Colors.grey),
+              title: const Text('Daily Forecast'),
+              onTap: () {},
+            ),
+            ListTile(
+              leading: const Icon(Icons.location_city, color: Colors.grey),
+              title: const Text('Places'),
+              onTap: () {
+                Navigator.pop(context);
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const PlacesScreen()));
+              },
+            ),
+          ],
+        ),
       ),
       body: FutureBuilder<Weather>(
         future: weatherData,
