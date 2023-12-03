@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:weatherapp/screens/daily-forecast-screen.dart';
 import 'package:weatherapp/screens/places_screen.dart';
 
 import '../models/weather.dart';
@@ -13,6 +14,7 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   late Future<Weather> weatherData;
+  // Search bar to take a city name dynamically
 
   @override
   void initState() {
@@ -76,7 +78,14 @@ class _HomeScreenState extends State<HomeScreen> {
             ListTile(
               leading: const Icon(Icons.calendar_today, color: Colors.grey),
               title: const Text('Daily Forecast'),
-              onTap: () {},
+              onTap: () {
+                Navigator.pop(context);
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) =>
+                            const DailyForecastScreen(cityName: 'Jerusalem')));
+              },
             ),
             ListTile(
               leading: const Icon(Icons.location_city, color: Colors.grey),

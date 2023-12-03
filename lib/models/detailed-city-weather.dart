@@ -13,11 +13,13 @@ class DetailedCityWeather extends Weather {
     required double temperature,
     required String condition,
     required String icon,
+    // required List<DayWeather> dailyForecast,
   }) : super(
           cityName: cityName,
           temperature: temperature,
           condition: condition,
           icon: icon,
+          // dailyForecast: dailyForecast,
         );
 
   factory DetailedCityWeather.fromJson(Map<String, dynamic> json) {

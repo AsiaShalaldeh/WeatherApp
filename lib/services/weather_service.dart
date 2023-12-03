@@ -5,7 +5,7 @@ import 'package:weatherapp/models/weather.dart';
 
 class WeatherService {
   static const String apiKey = '8cc668fb0aa34a37b14112638232111';
-  static const String city = 'London';
+  static const String city = 'Jerusalem';
 
   Future<Map<String, dynamic>> fetchWeatherData(String city) async {
     final response = await http.get(Uri.parse(
@@ -26,15 +26,37 @@ class WeatherService {
       'Istanbul',
       'Vancouver',
       'Hebron',
-      'Montreal'
+      'Montreal',
+      'Amman',
+      'Cairo',
+      'Madrid',
+      'Baku',
+      'Kabul',
+      'Paris',
+      'Bern',
+      'Baghdad',
+      'Amsterdam',
+      'Berlin'
     ];
     final List<Weather> weatherDataList = [];
 
-    for (final city in cities) { // I can use Map function
+    for (final city in cities) {
+      // I can use Map function
       final response = await fetchWeatherData(city);
       weatherDataList.add(Weather.fromJson(response));
     }
     // cities.map((city) => )
     return weatherDataList;
+  }
+
+  Future<Map<String, dynamic>> fetchDailyForecast(String cityName) async {
+    final response = await http.get(Uri.parse(
+        'http://api.weatherapi.com/v1/forecast.json?key=$apiKey&q=$cityName&days=7&aqi=no&alerts=no'));
+
+    if (response.statusCode == 200) {
+      return json.decode(response.body);
+    } else {
+      throw Exception('Failed to fetch daily forecast data');
+    }
   }
 }
