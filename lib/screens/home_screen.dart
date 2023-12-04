@@ -4,6 +4,7 @@ import 'package:weatherapp/screens/places_screen.dart';
 
 import '../models/weather.dart';
 import '../services/weather_service.dart';
+import 'hourly-forecast-screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -73,7 +74,14 @@ class _HomeScreenState extends State<HomeScreen> {
             ListTile(
               leading: const Icon(Icons.access_time, color: Colors.grey),
               title: const Text('Hourly Forecast'),
-              onTap: () {},
+              onTap: () {
+                Navigator.pop(context);
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) =>
+                            const HourlyForecastScreen(cityName: 'Jerusalem')));
+              },
             ),
             ListTile(
               leading: const Icon(Icons.calendar_today, color: Colors.grey),
