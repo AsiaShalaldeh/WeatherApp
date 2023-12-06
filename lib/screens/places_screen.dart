@@ -67,7 +67,7 @@ class _PlacesScreenState extends State<PlacesScreen> {
   Widget _buildCityItem(Weather city) {
     return ListTile(
       tileColor: Colors.white70,
-      title: Text(city.cityName),
+      title: Text(city.city.cityName),
       subtitle: Text('${city.temperature}°C\n${city.condition}'),
       leading: Image.network("http:${city.icon}",
           // fit: BoxFit.cover,

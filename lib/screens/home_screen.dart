@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:weatherapp/screens/daily-forecast-screen.dart';
 import 'package:weatherapp/screens/places_screen.dart';
 
+import '../models/city.dart';
 import '../models/weather.dart';
 import '../services/weather_service.dart';
 import 'hourly-forecast-screen.dart';
@@ -15,6 +16,7 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   late Future<Weather> weatherData;
+  final String cityName = 'London';
   // Search bar to take a city name dynamically
 
   @override
@@ -25,8 +27,10 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Future<Weather> _fetchWeatherData() async {
     try {
-      final response = await WeatherService().fetchWeatherData('London');
-      return Weather.fromJson(response);
+      final response = await WeatherService().fetchWeatherData(cityName);
+      final List<City> cities = await WeatherService().loadCities();
+      final City city = cities.firstWhere((c) => c.cityName == cityName);
+      return Weather.fromJson(response, city);
     } catch (e) {
       throw Exception('Failed to load weather data: $e');
     }
@@ -35,7 +39,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      // backgroundColor: Colors.white,
       appBar: AppBar(
         title: const Text('Weather App', style: TextStyle(color: Colors.black)),
         leading: Builder(
@@ -65,10 +69,6 @@ class _HomeScreenState extends State<HomeScreen> {
               title: const Text('Home'),
               onTap: () {
                 Navigator.pop(context);
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => const HomeScreen()));
               },
             ),
             ListTile(
@@ -80,7 +80,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     context,
                     MaterialPageRoute(
                         builder: (context) =>
-                            const HourlyForecastScreen(cityName: 'Jerusalem')));
+                            const HourlyForecastScreen(cityName: 'London')));
               },
             ),
             ListTile(
@@ -92,7 +92,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     context,
                     MaterialPageRoute(
                         builder: (context) =>
-                            const DailyForecastScreen(cityName: 'Jerusalem')));
+                            const DailyForecastScreen(cityName: 'London')));
               },
             ),
             ListTile(
@@ -114,17 +114,49 @@ class _HomeScreenState extends State<HomeScreen> {
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(
-                child: CircularProgressIndicator(
-              color: Colors.blue,
-            ));
+              child: CircularProgressIndicator(
+                color: Colors.blue,
+              ),
+            );
           } else if (snapshot.hasError) {
             return Center(child: Text('Error: ${snapshot.error}'));
-          } else {
+          } else if (snapshot.hasData) {
             final Weather weather = snapshot.data!;
-            return _buildWeatherUI(weather);
+            final City city = weather.city;
+
+            return Container(
+              height: double.infinity,
+              width: double.infinity,
+              constraints: const BoxConstraints.expand(),
+              decoration: BoxDecoration(
+                image: city.cityImage != null
+                    ? DecorationImage(
+                        image: AssetImage(city.cityImage!),
+                        fit: BoxFit.cover,
+                      )
+                    : null,
+                color: Colors.black.withOpacity(0.1),
+              ),
+              child: _buildWeatherUI(weather),
+            );
+          } else {
+            // Handle the case where snapshot has no data
+            return Center(child: Text('No data available.'));
           }
         },
       ),
+      // floatingActionButton: GestureDetector(
+      //   onTap: () {
+      //     Scaffold.of(context).openDrawer();
+      //   },
+      //   child: Container(
+      //     margin: const EdgeInsets.only(left: 16, top: 0),
+      //     child: Icon(
+      //       Icons.menu,
+      //       color: Colors.black,
+      //     ),
+      //   ),
+      // ),
     );
   }
 
@@ -134,8 +166,8 @@ class _HomeScreenState extends State<HomeScreen> {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Text(
-            weather.cityName,
-            style: const TextStyle(fontSize: 24.0),
+            weather.city.cityName,
+            style: const TextStyle(fontSize: 24.0, color: Colors.white),
           ),
           const SizedBox(height: 16.0),
           Image.network(
@@ -146,12 +178,12 @@ class _HomeScreenState extends State<HomeScreen> {
           const SizedBox(height: 16.0),
           Text(
             '${weather.temperature} °C',
-            style: const TextStyle(fontSize: 24.0),
+            style: const TextStyle(fontSize: 24.0, color: Colors.white),
           ),
           const SizedBox(height: 16.0),
           Text(
             weather.condition,
-            style: const TextStyle(fontSize: 24.0),
+            style: const TextStyle(fontSize: 24.0, color: Colors.white),
           ),
         ],
       ),

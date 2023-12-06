@@ -1,8 +1,10 @@
 import 'dart:convert';
 
+import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 import 'package:weatherapp/models/weather.dart';
 
+import '../models/city.dart';
 import '../models/hourly-weather.dart';
 
 class WeatherService {
@@ -20,35 +22,39 @@ class WeatherService {
     }
   }
 
-  Future<List<Weather>> fetchWeatherForCities() async {
-    const List<String> cities = [
-      'Toronto',
-      'London',
-      'Jerusalem',
-      'Istanbul',
-      'Vancouver',
-      'Hebron',
-      'Montreal',
-      'Amman',
-      'Cairo',
-      'Madrid',
-      'Baku',
-      'Kabul',
-      'Paris',
-      'Bern',
-      'Baghdad',
-      'Amsterdam',
-      'Berlin'
-    ];
-    final List<Weather> weatherDataList = [];
+  Future<List<City>> loadCities() async {
+    try {
+      // Load the JSON file from the assets
+      final String jsonString =
+          await rootBundle.loadString("assets/cities.json");
 
-    for (final city in cities) {
-      // I can use Map function
-      final response = await fetchWeatherData(city);
-      weatherDataList.add(Weather.fromJson(response));
+      // Parse the JSON string
+      final List<dynamic> jsonList = json.decode(jsonString);
+
+      // Convert the list of dynamic to List<City>
+      final List<City> cities =
+          jsonList.map((json) => City.fromJson(json)).toList();
+
+      return cities;
+    } catch (e) {
+      throw Exception('Failed to load cities: $e');
     }
-    // cities.map((city) => )
-    return weatherDataList;
+  }
+
+  Future<List<Weather>> fetchWeatherForCities() async {
+    try {
+      final List<City> cities = await loadCities();
+      final List<Weather> weatherDataList = [];
+
+      for (final city in cities) {
+        final response = await fetchWeatherData(city.cityName);
+        weatherDataList.add(Weather.fromJson(response, city));
+      }
+
+      return weatherDataList;
+    } catch (e) {
+      throw Exception('Failed to Fetch weather for cities: $e');
+    }
   }
 
   Future<Map<String, dynamic>> fetchDailyForecast(String cityName) async {
