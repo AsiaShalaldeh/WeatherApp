@@ -17,7 +17,6 @@ class DayWeather {
 
   factory DayWeather.fromJson(Map<String, dynamic> json) {
     return DayWeather(
-      // dayNumber: json['date_epoch'],
       date: json['date'],
       high: json['day']['maxtemp_c'],
       low: json['day']['mintemp_c'],

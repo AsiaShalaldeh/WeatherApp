@@ -39,7 +39,6 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // backgroundColor: Colors.white,
       appBar: AppBar(
         title: const Text('Weather App', style: TextStyle(color: Colors.black)),
         leading: Builder(
@@ -61,8 +60,13 @@ class _HomeScreenState extends State<HomeScreen> {
           padding: EdgeInsets.zero,
           children: <Widget>[
             const DrawerHeader(
-                decoration: BoxDecoration(color: Colors.grey),
-                child: Text('Weather App',
+                decoration: BoxDecoration(
+                  image: DecorationImage(
+                    image: AssetImage("assets/images/sky.jpg"),
+                    fit: BoxFit.fitWidth,
+                  ),
+                ),
+                child: Text('',
                     style: TextStyle(color: Colors.white, fontSize: 24))),
             ListTile(
               leading: const Icon(Icons.home, color: Colors.grey),
@@ -125,8 +129,8 @@ class _HomeScreenState extends State<HomeScreen> {
             final City city = weather.city;
 
             return Container(
-              height: double.infinity,
-              width: double.infinity,
+              // height: double.infinity,
+              // width: double.infinity,
               constraints: const BoxConstraints.expand(),
               decoration: BoxDecoration(
                 image: city.cityImage != null
@@ -141,7 +145,7 @@ class _HomeScreenState extends State<HomeScreen> {
             );
           } else {
             // Handle the case where snapshot has no data
-            return Center(child: Text('No data available.'));
+            return const Center(child: Text('No data available.'));
           }
         },
       ),
@@ -161,31 +165,47 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildWeatherUI(Weather weather) {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Text(
-            weather.city.cityName,
-            style: const TextStyle(fontSize: 24.0, color: Colors.white),
-          ),
-          const SizedBox(height: 16.0),
-          Image.network(
-            "http:${weather.icon}",
-            height: 64.0,
-            width: 64.0,
-          ),
-          const SizedBox(height: 16.0),
-          Text(
-            '${weather.temperature} °C',
-            style: const TextStyle(fontSize: 24.0, color: Colors.white),
-          ),
-          const SizedBox(height: 16.0),
-          Text(
-            weather.condition,
-            style: const TextStyle(fontSize: 24.0, color: Colors.white),
+    return Container(
+      margin: const EdgeInsets.all(48.0),
+      decoration: BoxDecoration(
+        color: Colors.black.withOpacity(0.1),
+        shape: BoxShape.circle,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.5),
+            spreadRadius: 2,
+            blurRadius: 5,
+            offset: const Offset(0, 3),
           ),
         ],
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(1.0),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              weather.city.cityName,
+              style: const TextStyle(fontSize: 18.0, color: Colors.white),
+            ),
+            const SizedBox(height: 8.0),
+            Image.network(
+              "http:${weather.icon}",
+              height: 48.0,
+              width: 48.0,
+            ),
+            const SizedBox(height: 8.0),
+            Text(
+              '${weather.temperature} °C',
+              style: const TextStyle(fontSize: 18.0, color: Colors.white),
+            ),
+            const SizedBox(height: 8.0),
+            Text(
+              weather.condition,
+              style: const TextStyle(fontSize: 18.0, color: Colors.white),
+            ),
+          ],
+        ),
       ),
     );
   }

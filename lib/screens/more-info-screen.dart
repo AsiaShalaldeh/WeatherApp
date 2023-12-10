@@ -47,8 +47,6 @@ class _MoreInformationScreenState extends State<MoreInformationScreen> {
       //   title: Text(widget.cityWeather.city.cityName),
       // ),
       body: Container(
-        height: double.infinity,
-        width: double.infinity,
         constraints: const BoxConstraints.expand(),
         decoration: BoxDecoration(
           image: widget.cityWeather.city != null &&
@@ -69,51 +67,73 @@ class _MoreInformationScreenState extends State<MoreInformationScreen> {
             } else {
               DetailedCityWeather data = snapshot.data!;
               return Center(
-                child: Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Text(
-                        widget.cityWeather.city.cityName,
-                        style: const TextStyle(
-                          fontSize: 24.0,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
+                child: Container(
+                  height: 340.0,
+                  width: 260.0,
+                  decoration: BoxDecoration(
+                    color: Colors.black.withOpacity(0.3),
+                    borderRadius: BorderRadius.circular(16.0),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Text(
+                          widget.cityWeather.city.cityName,
+                          style: const TextStyle(
+                            fontSize: 24.0,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
                         ),
-                      ),
-                      const SizedBox(height: 16.0),
-                      Text(
-                        'Temperature: ${widget.cityWeather.temperature}°C',
-                        style: const TextStyle(
-                            fontSize: 18.0, color: Colors.white),
-                      ),
-                      Text(
-                        'Condition: ${widget.cityWeather.condition}',
-                        style: const TextStyle(
-                            fontSize: 18.0, color: Colors.white),
-                      ),
-                      Text(
-                        'Wind: ${data.windSpeed} km/h ${data.windDirection}',
-                        style: const TextStyle(
-                            fontSize: 18.0, color: Colors.white),
-                      ),
-                      Text(
-                        'Pressure: ${data.pressure} mb',
-                        style: const TextStyle(
-                            fontSize: 18.0, color: Colors.white),
-                      ),
-                      const SizedBox(height: 16.0),
-                      Image.network("http:${widget.cityWeather.icon}"),
-                      const SizedBox(height: 16.0),
-                      ElevatedButton(
-                        onPressed: () {
-                          Navigator.pop(context);
-                        },
-                        child: const Text('Back'),
-                      ),
-                    ],
+                        const SizedBox(height: 16.0),
+                        Image.network("http:${widget.cityWeather.icon}"),
+                        const SizedBox(height: 16.0),
+                        Text(
+                          'Temperature: ${widget.cityWeather.temperature}°C',
+                          style: const TextStyle(
+                              fontSize: 18.0, color: Colors.white),
+                        ),
+                        Text(
+                          'Condition: ${widget.cityWeather.condition}',
+                          style: const TextStyle(
+                              fontSize: 18.0, color: Colors.white),
+                        ),
+                        Text(
+                          'Wind: ${data.windSpeed} km/h ${data.windDirection}',
+                          style: const TextStyle(
+                              fontSize: 18.0, color: Colors.white),
+                        ),
+                        Text(
+                          'Pressure: ${data.pressure} mb',
+                          style: const TextStyle(
+                              fontSize: 18.0, color: Colors.white),
+                        ),
+                        const SizedBox(height: 16.0),
+                        InkWell(
+                          onTap: () {
+                            Navigator.pop(context);
+                          },
+                          child: Container(
+                            padding: const EdgeInsets.all(8.0),
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              border: Border.all(
+                                color: Colors.white,
+                                width: 2.0,
+                              ),
+                            ),
+                            child: const Icon(
+                              Icons.arrow_forward,
+                              color: Colors.white,
+                              size: 24.0,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               );

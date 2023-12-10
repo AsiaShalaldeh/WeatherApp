@@ -25,6 +25,7 @@ class HourlyForecastScreen extends StatelessWidget {
           'Hourly Forecast - $cityName',
           style: const TextStyle(color: Colors.black),
         ),
+        iconTheme: IconThemeData(color: Colors.black),
       ),
       body: FutureBuilder<List<HourlyWeather>>(
         future: _fetchHourlyForecastData(),
@@ -35,7 +36,14 @@ class HourlyForecastScreen extends StatelessWidget {
             return Center(child: Text('Error: ${snapshot.error}'));
           } else {
             final List<HourlyWeather> hourlyForecast = snapshot.data!;
-            return _buildHourlyForecastUI(hourlyForecast);
+            return Container(
+                constraints: const BoxConstraints.expand(),
+                decoration: const BoxDecoration(
+                    image: DecorationImage(
+                  image: AssetImage("assets/images/london.jpg"),
+                  fit: BoxFit.cover,
+                )),
+                child: _buildHourlyForecastUI(hourlyForecast));
           }
         },
       ),
@@ -44,27 +52,44 @@ class HourlyForecastScreen extends StatelessWidget {
 
   Widget _buildHourlyForecastUI(List<HourlyWeather> hourlyForecast) {
     return ListView.builder(
-      scrollDirection:
-          Axis.horizontal, // Set the scroll direction to horizontal
+      scrollDirection: Axis.horizontal,
       itemCount: hourlyForecast.length,
       itemBuilder: (context, index) {
         HourlyWeather hourlyWeather = hourlyForecast[index];
 
-        return Card(
-          margin: const EdgeInsets.all(8.0),
-          child: Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Column(
-              children: [
-                Text(
-                  '${hourlyWeather.time.day}-${hourlyWeather.time.month}-${hourlyWeather.time.year}'
-                  '\n${hourlyWeather.time.hour}:${hourlyWeather.time.minute}',
-                ),
-                const SizedBox(height: 8.0),
-                Text('${hourlyWeather.temperature} °C'),
-                const SizedBox(height: 8.0),
-                Image.network("http:${hourlyWeather.icon}"),
-              ],
+        return Container(
+          width: 160.0,
+          height: 50.0,
+          decoration: BoxDecoration(
+            color: Colors.white.withOpacity(0.4),
+          ),
+          child: Card(
+            elevation: 5.0,
+            color: Colors.transparent,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(100.0),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.only(bottom: 1.0),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Text('Today',
+                      style: TextStyle(color: Colors.white, fontSize: 24.0)),
+                  const SizedBox(height: 8.0),
+                  Text(
+                    '${hourlyWeather.time.hour}:${hourlyWeather.time.minute}0',
+                    style: const TextStyle(color: Colors.white, fontSize: 24.0),
+                  ),
+                  const SizedBox(height: 8.0),
+                  Image.network("http:${hourlyWeather.icon}"),
+                  // const SizedBox(height: 8.0),
+                  Text(
+                    '${hourlyWeather.temperature} °C',
+                    style: const TextStyle(color: Colors.white, fontSize: 24.0),
+                  ),
+                ],
+              ),
             ),
           ),
         );

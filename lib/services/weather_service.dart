@@ -8,7 +8,8 @@ import '../models/city.dart';
 import '../models/hourly-weather.dart';
 
 class WeatherService {
-  static const String apiKey = '8cc668fb0aa34a37b14112638232111';
+  // static const String apiKey = '8cc668fb0aa34a37b14112638232111';
+  static const String apiKey = '6b25e39a925a4187b5c72137232411';
   static const String city = 'Jerusalem';
 
   Future<Map<String, dynamic>> fetchWeatherData(String city) async {
@@ -59,7 +60,7 @@ class WeatherService {
 
   Future<Map<String, dynamic>> fetchDailyForecast(String cityName) async {
     final response = await http.get(Uri.parse(
-        'http://api.weatherapi.com/v1/forecast.json?key=$apiKey&q=$cityName&days=7'));
+        'http://api.weatherapi.com/v1/forecast.json?key=$apiKey&q=London&days=7'));
 
     if (response.statusCode == 200) {
       return json.decode(response.body);

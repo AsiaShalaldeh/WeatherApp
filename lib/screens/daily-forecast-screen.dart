@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
 import '../models/day-weather.dart';
-import '../services/weather_service.dart'; // Import your Weather model
-// import 'package:weatherapp/screens/weather_map_screen.dart'; // Import your WeatherMapScreen
+import '../services/weather_service.dart';
+// import 'package:weatherapp/screens/weather_map_screen.dart';
 
 class DailyForecastScreen extends StatefulWidget {
   final String cityName;
