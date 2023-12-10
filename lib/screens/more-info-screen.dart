@@ -7,12 +7,10 @@ import '../services/weather_service.dart';
 
 class MoreInformationScreen extends StatefulWidget {
   final Weather cityWeather;
-  // final City city;
 
   const MoreInformationScreen({
     Key? key,
     required this.cityWeather,
-    // required this.city
   }) : super(key: key);
 
   @override
@@ -25,11 +23,12 @@ class _MoreInformationScreenState extends State<MoreInformationScreen> {
   @override
   void initState() {
     super.initState();
-    detailedCityWeather = _fetchWeatherData(widget.cityWeather.city.cityName);
+    detailedCityWeather = _fetchWeatherData();
   }
 
-  Future<DetailedCityWeather> _fetchWeatherData(String cityName) async {
+  Future<DetailedCityWeather> _fetchWeatherData() async {
     try {
+      String cityName = widget.cityWeather.city.cityName;
       final response = await WeatherService().fetchWeatherData(cityName);
       final List<City> cities = await WeatherService().loadCities();
       final City city = cities.firstWhere((c) => c.cityName == cityName);

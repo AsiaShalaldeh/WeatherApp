@@ -31,7 +31,6 @@ class DetailedCityWeather extends Weather {
       windDirection: json['current']['wind_dir'],
       pressure: json['current']['pressure_mb'].toString(),
       windSpeed: json['current']['wind_kph'].toString(),
-      // cityName: json['location']['name'],
       city: city,
       temperature: json['current']['temp_c'],
       condition: json['current']['condition']['text'],

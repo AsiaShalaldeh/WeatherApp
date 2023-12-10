@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:weatherapp/screens/more-info-screen.dart';
 
 import '../models/weather.dart';
+import '../providers/selected-city-provider.dart';
 import '../services/weather_service.dart';
 
 class PlacesScreen extends StatefulWidget {
@@ -34,19 +36,15 @@ class _PlacesScreenState extends State<PlacesScreen> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: Text('Places'),
-        iconTheme: IconThemeData(color: Colors.black),
+        iconTheme: const IconThemeData(color: Colors.black),
       ),
       body: Container(
-        // decoration: BoxDecoration(
-        //   image: const DecorationImage(
-        //     image: AssetImage(
-        //         "assets/images/cloud.jpg"), // Replace with your cloud image asset
-        //     fit: BoxFit.cover,
-        //   ),
-        //   borderRadius:
-        //       BorderRadius.circular(15.0), // Adjust the border radius as needed
-        // ),
+        decoration: const BoxDecoration(
+          image: DecorationImage(
+            image: AssetImage(""),
+            fit: BoxFit.cover,
+          ),
+        ),
         child: FutureBuilder<List<Weather>>(
           future: cities,
           builder: (context, snapshot) {
@@ -65,8 +63,8 @@ class _PlacesScreenState extends State<PlacesScreen> {
               return ListView.builder(
                 itemCount: cityWeather.length,
                 itemBuilder: (context, index) {
-                  Weather city = cityWeather[index];
-                  return _buildCityCard(city);
+                  Weather weatherOfCity = cityWeather[index];
+                  return _buildCityCard(weatherOfCity);
                 },
               );
             }
@@ -76,25 +74,18 @@ class _PlacesScreenState extends State<PlacesScreen> {
     );
   }
 
-  Widget _buildCityCard(Weather city) {
+  Widget _buildCityCard(Weather weatherOfCity) {
     return Card(
       elevation: 5.0,
       margin: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
       shape: RoundedRectangleBorder(
-        borderRadius:
-            BorderRadius.circular(15.0), // Adjust the border radius as needed
+        borderRadius: BorderRadius.circular(15.0),
       ),
       child: Container(
         height: 120.0,
-        // decoration: BoxDecoration(
-        //   image: const DecorationImage(
-        //     image: AssetImage(
-        //         "assets/images/cloud.jpg"), // Replace with your cloud image asset
-        //     fit: BoxFit.cover,
-        //   ),
-        //   borderRadius:
-        //       BorderRadius.circular(15.0), // Adjust the border radius as needed
-        // ),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(15.0),
+        ),
         child: Stack(
           children: [
             Column(
@@ -103,20 +94,20 @@ class _PlacesScreenState extends State<PlacesScreen> {
               children: [
                 ListTile(
                   title: Text(
-                    city.city.cityName,
+                    weatherOfCity.city.cityName,
                     style: const TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: 16.0,
                     ),
                   ),
                   subtitle: Text(
-                    '${city.temperature}°C\n${city.condition}',
+                    '${weatherOfCity.temperature}°C\n${weatherOfCity.condition}',
                     style: const TextStyle(
                       fontSize: 14.0,
                     ),
                   ),
                   leading: Image.network(
-                    "http:${city.icon}",
+                    "http:${weatherOfCity.icon}",
                     height: 40.0,
                     width: 40.0,
                   ),
@@ -128,11 +119,13 @@ class _PlacesScreenState extends State<PlacesScreen> {
               right: 8.0,
               child: ElevatedButton(
                 onPressed: () {
+                  Provider.of<SelectedCityProvider>(context, listen: false)
+                      .updateSelectedCity(weatherOfCity.city.cityName);
                   Navigator.push(
                     context,
                     MaterialPageRoute(
                       builder: (context) =>
-                          MoreInformationScreen(cityWeather: city),
+                          MoreInformationScreen(cityWeather: weatherOfCity),
                     ),
                   );
                 },

@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:weatherapp/screens/daily-forecast-screen.dart';
+import 'package:provider/provider.dart';
+import 'package:weatherapp/models/city.dart';
+import 'package:weatherapp/models/weather.dart';
+import 'package:weatherapp/screens/hourly-forecast-screen.dart';
 import 'package:weatherapp/screens/places_screen.dart';
+import 'package:weatherapp/services/weather_service.dart';
 
-import '../models/city.dart';
-import '../models/weather.dart';
-import '../services/weather_service.dart';
-import 'hourly-forecast-screen.dart';
+import '../providers/selected-city-provider.dart';
+import 'daily-forecast-screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -16,8 +18,8 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   late Future<Weather> weatherData;
-  final String cityName = 'London';
-  // Search bar to take a city name dynamically
+  late String selectedCityName;
+  late City selectedCity;
 
   @override
   void initState() {
@@ -27,10 +29,14 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Future<Weather> _fetchWeatherData() async {
     try {
-      final response = await WeatherService().fetchWeatherData(cityName);
+      selectedCityName =
+          Provider.of<SelectedCityProvider>(context).selectedCity;
+
+      final response =
+          await WeatherService().fetchWeatherData(selectedCityName);
       final List<City> cities = await WeatherService().loadCities();
-      final City city = cities.firstWhere((c) => c.cityName == cityName);
-      return Weather.fromJson(response, city);
+      selectedCity = cities.firstWhere((c) => c.cityName == selectedCityName);
+      return Weather.fromJson(response, selectedCity);
     } catch (e) {
       throw Exception('Failed to load weather data: $e');
     }
@@ -84,7 +90,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     context,
                     MaterialPageRoute(
                         builder: (context) =>
-                            const HourlyForecastScreen(cityName: 'London')));
+                            HourlyForecastScreen(city: selectedCity)));
               },
             ),
             ListTile(
@@ -96,7 +102,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     context,
                     MaterialPageRoute(
                         builder: (context) =>
-                            const DailyForecastScreen(cityName: 'London')));
+                            DailyForecastScreen(city: selectedCity)));
               },
             ),
             ListTile(
@@ -113,54 +119,44 @@ class _HomeScreenState extends State<HomeScreen> {
           ],
         ),
       ),
-      body: FutureBuilder<Weather>(
-        future: weatherData,
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(
-              child: CircularProgressIndicator(
-                color: Colors.blue,
-              ),
-            );
-          } else if (snapshot.hasError) {
-            return Center(child: Text('Error: ${snapshot.error}'));
-          } else if (snapshot.hasData) {
-            final Weather weather = snapshot.data!;
-            final City city = weather.city;
+      body: Consumer<SelectedCityProvider>(
+        builder: (context, selectedCityProvider, child) {
+          final selectedCity = selectedCityProvider.selectedCity;
+          return FutureBuilder<Weather>(
+            future: _fetchWeatherData(),
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return const Center(
+                  child: CircularProgressIndicator(
+                    color: Colors.blue,
+                  ),
+                );
+              } else if (snapshot.hasError) {
+                return Center(child: Text('Error: ${snapshot.error}'));
+              } else if (snapshot.hasData) {
+                final Weather weather = snapshot.data!;
+                final City city = weather.city;
 
-            return Container(
-              // height: double.infinity,
-              // width: double.infinity,
-              constraints: const BoxConstraints.expand(),
-              decoration: BoxDecoration(
-                image: city.cityImage != null
-                    ? DecorationImage(
-                        image: AssetImage(city.cityImage!),
-                        fit: BoxFit.cover,
-                      )
-                    : null,
-                color: Colors.black.withOpacity(0.1),
-              ),
-              child: _buildWeatherUI(weather),
-            );
-          } else {
-            // Handle the case where snapshot has no data
-            return const Center(child: Text('No data available.'));
-          }
+                return Container(
+                  constraints: const BoxConstraints.expand(),
+                  decoration: BoxDecoration(
+                    image: city.cityImage != null
+                        ? DecorationImage(
+                            image: AssetImage(city.cityImage!),
+                            fit: BoxFit.cover,
+                          )
+                        : null,
+                    color: Colors.black.withOpacity(0.1),
+                  ),
+                  child: _buildWeatherUI(weather),
+                );
+              } else {
+                return const Center(child: Text('No data available.'));
+              }
+            },
+          );
         },
       ),
-      // floatingActionButton: GestureDetector(
-      //   onTap: () {
-      //     Scaffold.of(context).openDrawer();
-      //   },
-      //   child: Container(
-      //     margin: const EdgeInsets.only(left: 16, top: 0),
-      //     child: Icon(
-      //       Icons.menu,
-      //       color: Colors.black,
-      //     ),
-      //   ),
-      // ),
     );
   }
 

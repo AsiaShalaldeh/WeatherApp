@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:weatherapp/services/weather_service.dart';
 
+import '../models/city.dart';
 import '../models/hourly-weather.dart';
 
 class HourlyForecastScreen extends StatelessWidget {
-  final String cityName;
+  final City city;
 
-  const HourlyForecastScreen({Key? key, required this.cityName})
-      : super(key: key);
+  const HourlyForecastScreen({Key? key, required this.city}) : super(key: key);
 
   Future<List<HourlyWeather>> _fetchHourlyForecastData() async {
     try {
@@ -22,10 +22,10 @@ class HourlyForecastScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'Hourly Forecast - $cityName',
+          city.cityName,
           style: const TextStyle(color: Colors.black),
         ),
-        iconTheme: IconThemeData(color: Colors.black),
+        iconTheme: const IconThemeData(color: Colors.black),
       ),
       body: FutureBuilder<List<HourlyWeather>>(
         future: _fetchHourlyForecastData(),
@@ -83,7 +83,6 @@ class HourlyForecastScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 8.0),
                   Image.network("http:${hourlyWeather.icon}"),
-                  // const SizedBox(height: 8.0),
                   Text(
                     '${hourlyWeather.temperature} °C',
                     style: const TextStyle(color: Colors.white, fontSize: 24.0),

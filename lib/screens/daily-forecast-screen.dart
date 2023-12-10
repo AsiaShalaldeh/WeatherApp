@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 
+import '../models/city.dart';
 import '../models/day-weather.dart';
 import '../services/weather_service.dart';
 // import 'package:weatherapp/screens/weather_map_screen.dart';
 
 class DailyForecastScreen extends StatefulWidget {
-  final String cityName;
+  final City city;
 
-  const DailyForecastScreen({Key? key, required this.cityName})
-      : super(key: key);
+  const DailyForecastScreen({Key? key, required this.city}) : super(key: key);
 
   @override
   State<DailyForecastScreen> createState() => _DailyForecastScreenState();
@@ -26,7 +26,7 @@ class _DailyForecastScreenState extends State<DailyForecastScreen> {
   Future<List<DayWeather>> _fetchDailyForecastData() async {
     try {
       final response =
-          await WeatherService().fetchDailyForecast(widget.cityName);
+          await WeatherService().fetchDailyForecast(widget.city.cityName);
 
       final List<DayWeather> forecastData =
           (response['forecast']['forecastday'] as List)
@@ -44,9 +44,10 @@ class _DailyForecastScreenState extends State<DailyForecastScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'Daily Forecast - ${widget.cityName}',
+          widget.city.cityName,
           style: const TextStyle(color: Colors.black),
         ),
+        iconTheme: const IconThemeData(color: Colors.black),
       ),
       body: FutureBuilder<List<DayWeather>>(
         future: dailyForecastData,
