@@ -38,9 +38,9 @@ class HourlyForecastScreen extends StatelessWidget {
             final List<HourlyWeather> hourlyForecast = snapshot.data!;
             return Container(
                 constraints: const BoxConstraints.expand(),
-                decoration: const BoxDecoration(
+                decoration: BoxDecoration(
                     image: DecorationImage(
-                  image: AssetImage("assets/images/london.jpg"),
+                  image: AssetImage(city.cityImage),
                   fit: BoxFit.cover,
                 )),
                 child: _buildHourlyForecastUI(hourlyForecast));

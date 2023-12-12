@@ -6,6 +6,7 @@ import 'package:weatherapp/models/weather.dart';
 
 import '../models/city.dart';
 import '../models/hourly-weather.dart';
+import '../providers/database-provider.dart';
 
 class WeatherService {
   // static const String apiKey = '8cc668fb0aa34a37b14112638232111';
@@ -44,7 +45,8 @@ class WeatherService {
 
   Future<List<Weather>> fetchWeatherForCities() async {
     try {
-      final List<City> cities = await loadCities();
+      // final List<City> cities = await loadCities();
+      final List<City> cities = await DatabaseProvider.instance.getAllCities();
       final List<Weather> weatherDataList = [];
 
       for (final city in cities) {

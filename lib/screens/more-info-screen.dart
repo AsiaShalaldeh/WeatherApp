@@ -3,6 +3,7 @@ import 'package:weatherapp/models/detailed-city-weather.dart';
 
 import '../models/city.dart';
 import '../models/weather.dart';
+import '../providers/database-provider.dart';
 import '../services/weather_service.dart';
 
 class MoreInformationScreen extends StatefulWidget {
@@ -30,7 +31,8 @@ class _MoreInformationScreenState extends State<MoreInformationScreen> {
     try {
       String cityName = widget.cityWeather.city.cityName;
       final response = await WeatherService().fetchWeatherData(cityName);
-      final List<City> cities = await WeatherService().loadCities();
+      // final List<City> cities = await WeatherService().loadCities();
+      final List<City> cities = await DatabaseProvider.instance.getAllCities();
       final City city = cities.firstWhere((c) => c.cityName == cityName);
       return DetailedCityWeather.fromJson(response, city);
     } catch (e) {

@@ -6,6 +6,7 @@ import 'package:weatherapp/screens/hourly-forecast-screen.dart';
 import 'package:weatherapp/screens/places_screen.dart';
 import 'package:weatherapp/services/weather_service.dart';
 
+import '../providers/database-provider.dart';
 import '../providers/selected-city-provider.dart';
 import 'daily-forecast-screen.dart';
 
@@ -34,7 +35,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
       final response =
           await WeatherService().fetchWeatherData(selectedCityName);
-      final List<City> cities = await WeatherService().loadCities();
+      // final List<City> cities = await WeatherService().loadCities();
+      final List<City> cities = await DatabaseProvider.instance.getAllCities();
       selectedCity = cities.firstWhere((c) => c.cityName == selectedCityName);
       return Weather.fromJson(response, selectedCity);
     } catch (e) {
