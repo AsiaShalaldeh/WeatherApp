@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+
+// import 'package:intl/intl.dart';
 
 import '../models/city.dart';
 import '../models/day-weather.dart';
 import '../services/weather_service.dart';
-// import 'package:weatherapp/screens/weather_map_screen.dart';
 
 class DailyForecastScreen extends StatefulWidget {
   final City city;
@@ -28,10 +30,13 @@ class _DailyForecastScreenState extends State<DailyForecastScreen> {
       final response =
           await WeatherService().fetchDailyForecast(widget.city.cityName);
 
-      final List<DayWeather> forecastData =
-          (response['forecast']['forecastday'] as List)
-              .map((dayData) => DayWeather.fromJson(dayData))
-              .toList();
+      final double latitude = response['location']['lat'];
+      final double longitude = response['location']['lon'];
+
+      final List<DayWeather> forecastData = (response['forecast']['forecastday']
+              as List)
+          .map((dayData) => DayWeather.fromJson(dayData, longitude, latitude))
+          .toList();
 
       return forecastData;
     } catch (e) {
@@ -42,6 +47,7 @@ class _DailyForecastScreenState extends State<DailyForecastScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
         title: Text(
           widget.city.cityName,
@@ -58,7 +64,30 @@ class _DailyForecastScreenState extends State<DailyForecastScreen> {
             return Center(child: Text('Error: ${snapshot.error}'));
           } else {
             final List<DayWeather> dailyForecast = snapshot.data!;
-            return _buildDailyForecastList(dailyForecast);
+            return Container(
+              decoration: BoxDecoration(
+                image: const DecorationImage(
+                  image: AssetImage("assets/images/mountain.jpg"),
+                  fit: BoxFit.cover,
+                ),
+                color: Colors.black.withOpacity(0.1),
+              ),
+              child: _buildDailyForecastList(dailyForecast),
+            );
+            // FloatingActionButton(
+            //   onPressed: () {
+            //     Navigator.push(
+            //       context,
+            //       MaterialPageRoute(
+            //         builder: (context) => WeatherMapScreen(
+            //           dayWeather: dailyForecast[0],
+            //           city: widget.city,
+            //         ),
+            //       ),
+            //     );
+            //   },
+            //   child: const Icon(Icons.map),
+            // ),
           }
         },
       ),
@@ -70,32 +99,65 @@ class _DailyForecastScreenState extends State<DailyForecastScreen> {
       itemCount: dailyForecast.length,
       itemBuilder: (context, index) {
         DayWeather dayForecast = dailyForecast[index];
-        return _buildDayForecastItem(dayForecast);
+        DateTime parsedDate = DateTime.parse(dayForecast.date);
+        String dayName = DateFormat('EEEE').format(parsedDate);
+        return Container(
+          padding: const EdgeInsets.all(16.0),
+          height: 300.0,
+          margin: const EdgeInsets.symmetric(horizontal: 64.0, vertical: 10),
+          decoration: BoxDecoration(
+            color: Colors.black.withOpacity(0.3),
+            borderRadius: BorderRadius.circular(8),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.1),
+                spreadRadius: 2,
+                blurRadius: 5,
+                offset: const Offset(0, 5),
+              ),
+            ],
+          ),
+          child: ListTile(
+            subtitle: Column(
+              children: [
+                Text(
+                  dayName,
+                  style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 18,
+                      color: Colors.white),
+                ),
+                Image.network(
+                  "http:${dayForecast.icon}",
+                  height: 130.0,
+                  width: 130.0,
+                  fit: BoxFit.cover,
+                ),
+                Text(
+                  dayForecast.condition,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                    color: Colors.white,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  '${dayForecast.high}°C',
+                  style: const TextStyle(
+                    fontSize: 24.0,
+                    color: Colors.white,
+                  ),
+                ),
+                Text(
+                  '${dayForecast.low}°C',
+                  style: const TextStyle(fontSize: 16.0, color: Colors.white),
+                )
+              ],
+            ),
+          ),
+        );
       },
-    );
-  }
-
-  Widget _buildDayForecastItem(DayWeather dayForecast) {
-    return ListTile(
-      title: Text('${dayForecast.date}\n${dayForecast.condition}'),
-      // Day #
-      subtitle: Text('High: ${dayForecast.high}°C\nLow: ${dayForecast.low}°C'),
-      leading: Image.network(
-        "http:${dayForecast.icon}",
-        height: 40.0,
-        width: 40.0,
-      ),
-      trailing: ElevatedButton(
-        onPressed: () {
-          // Navigator.push(
-          //   context,
-          //   MaterialPageRoute(
-          //     builder: (context) => WeatherMapScreen(cityName: widget.cityName),
-          //   ),
-          // );
-        },
-        child: const Text('Show on Map'),
-      ),
     );
   }
 }

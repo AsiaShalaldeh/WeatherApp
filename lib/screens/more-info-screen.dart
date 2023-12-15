@@ -3,8 +3,8 @@ import 'package:weatherapp/models/detailed-city-weather.dart';
 
 import '../models/city.dart';
 import '../models/weather.dart';
-import '../providers/database-provider.dart';
 import '../services/weather_service.dart';
+import '../widgets/weather-info-tile.dart';
 
 class MoreInformationScreen extends StatefulWidget {
   final Weather cityWeather;
@@ -31,8 +31,7 @@ class _MoreInformationScreenState extends State<MoreInformationScreen> {
     try {
       String cityName = widget.cityWeather.city.cityName;
       final response = await WeatherService().fetchWeatherData(cityName);
-      // final List<City> cities = await WeatherService().loadCities();
-      final List<City> cities = await DatabaseProvider.instance.getAllCities();
+      final List<City> cities = await WeatherService().loadCities();
       final City city = cities.firstWhere((c) => c.cityName == cityName);
       return DetailedCityWeather.fromJson(response, city);
     } catch (e) {
@@ -43,10 +42,6 @@ class _MoreInformationScreenState extends State<MoreInformationScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // backgroundColor: Colors.white,
-      // appBar: AppBar(
-      //   title: Text(widget.cityWeather.city.cityName),
-      // ),
       body: Container(
         constraints: const BoxConstraints.expand(),
         decoration: BoxDecoration(
@@ -62,15 +57,18 @@ class _MoreInformationScreenState extends State<MoreInformationScreen> {
           future: detailedCityWeather,
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
-              return const Center(child: CircularProgressIndicator());
+              return const Center(
+                  child: CircularProgressIndicator(
+                color: Colors.green,
+              ));
             } else if (snapshot.hasError) {
               return Center(child: Text('Error: ${snapshot.error}'));
             } else {
               DetailedCityWeather data = snapshot.data!;
               return Center(
                 child: Container(
-                  height: 340.0,
-                  width: 260.0,
+                  height: 700.0,
+                  width: 350.0,
                   decoration: BoxDecoration(
                     color: Colors.black.withOpacity(0.3),
                     borderRadius: BorderRadius.circular(16.0),
@@ -89,28 +87,75 @@ class _MoreInformationScreenState extends State<MoreInformationScreen> {
                             color: Colors.white,
                           ),
                         ),
+                        // const SizedBox(height: 16.0),
+                        Image.network(
+                          "http:${widget.cityWeather.icon}",
+                          height: 80,
+                        ),
                         const SizedBox(height: 16.0),
-                        Image.network("http:${widget.cityWeather.icon}"),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: [
+                            WeatherInfoTile(
+                              iconData: Icons.thermostat,
+                              label: 'Temperature',
+                              value: '${widget.cityWeather.temperature}°C',
+                            ),
+                            WeatherInfoTile(
+                              iconData: Icons.waves,
+                              label: 'Condition',
+                              value: widget.cityWeather.condition,
+                            ),
+                          ],
+                        ),
                         const SizedBox(height: 16.0),
-                        Text(
-                          'Temperature: ${widget.cityWeather.temperature}°C',
-                          style: const TextStyle(
-                              fontSize: 18.0, color: Colors.white),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: [
+                            WeatherInfoTile(
+                              iconData: Icons.air,
+                              label: 'Wind',
+                              value:
+                                  '${data.windSpeed} km/h ${data.windDirection}',
+                            ),
+                            WeatherInfoTile(
+                              iconData: Icons.compress,
+                              label: 'Pressure',
+                              value: '${data.pressure} mb',
+                            ),
+                          ],
                         ),
-                        Text(
-                          'Condition: ${widget.cityWeather.condition}',
-                          style: const TextStyle(
-                              fontSize: 18.0, color: Colors.white),
+                        const SizedBox(height: 16.0),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: [
+                            WeatherInfoTile(
+                              iconData: Icons.water,
+                              label: 'Humidity',
+                              value: '${data.humidity}%',
+                            ),
+                            WeatherInfoTile(
+                              iconData: Icons.whatshot,
+                              label: 'Feels Like',
+                              value: '${data.feelsLike}°C',
+                            ),
+                          ],
                         ),
-                        Text(
-                          'Wind: ${data.windSpeed} km/h ${data.windDirection}',
-                          style: const TextStyle(
-                              fontSize: 18.0, color: Colors.white),
-                        ),
-                        Text(
-                          'Pressure: ${data.pressure} mb',
-                          style: const TextStyle(
-                              fontSize: 18.0, color: Colors.white),
+                        const SizedBox(height: 16.0),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: [
+                            WeatherInfoTile(
+                              iconData: Icons.navigation,
+                              label: 'Wind Direction',
+                              value: data.windDirection,
+                            ),
+                            WeatherInfoTile(
+                              iconData: Icons.swap_calls,
+                              label: 'Wind Degree',
+                              value: '${data.windDegree}°',
+                            ),
+                          ],
                         ),
                         const SizedBox(height: 16.0),
                         InkWell(

@@ -6,9 +6,10 @@ import 'package:weatherapp/screens/hourly-forecast-screen.dart';
 import 'package:weatherapp/screens/places_screen.dart';
 import 'package:weatherapp/services/weather_service.dart';
 
-import '../providers/database-provider.dart';
 import '../providers/selected-city-provider.dart';
+import 'current-location-screen.dart';
 import 'daily-forecast-screen.dart';
+import 'favorite-places-screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -32,11 +33,10 @@ class _HomeScreenState extends State<HomeScreen> {
     try {
       selectedCityName =
           Provider.of<SelectedCityProvider>(context).selectedCity;
-
       final response =
           await WeatherService().fetchWeatherData(selectedCityName);
-      // final List<City> cities = await WeatherService().loadCities();
-      final List<City> cities = await DatabaseProvider.instance.getAllCities();
+      final List<City> cities = await WeatherService().loadCities();
+      // final List<City> cities = await DatabaseProvider.instance.getAllCities();
       selectedCity = cities.firstWhere((c) => c.cityName == selectedCityName);
       return Weather.fromJson(response, selectedCity);
     } catch (e) {
@@ -116,6 +116,30 @@ class _HomeScreenState extends State<HomeScreen> {
                     context,
                     MaterialPageRoute(
                         builder: (context) => const PlacesScreen()));
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.star, color: Colors.yellow),
+              title: const Text('Favorite Places'),
+              onTap: () {
+                Navigator.pop(context);
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => const FavoritePlacesScreen()),
+                );
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.my_location),
+              title: const Text('Current Location'),
+              onTap: () {
+                Navigator.pop(context);
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => CurrentLocationScreen()),
+                );
               },
             ),
           ],

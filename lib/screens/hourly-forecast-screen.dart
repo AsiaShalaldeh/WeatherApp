@@ -51,15 +51,18 @@ class HourlyForecastScreen extends StatelessWidget {
   }
 
   Widget _buildHourlyForecastUI(List<HourlyWeather> hourlyForecast) {
-    return ListView.builder(
-      scrollDirection: Axis.horizontal,
-      itemCount: hourlyForecast.length,
-      itemBuilder: (context, index) {
-        HourlyWeather hourlyWeather = hourlyForecast[index];
+    // Get the current hour
+    final DateTime now = DateTime.now();
+    final int currentHour = now.hour;
+    // Filter the forecast data to get the current hour's weather and the following hours
+    final List<HourlyWeather> upcomingForecast = hourlyForecast
+        .where((hourlyWeather) => hourlyWeather.time.hour > currentHour)
+        .toList();
 
-        return Container(
-          width: 160.0,
-          height: 50.0,
+    return Column(
+      children: [
+        Container(
+          width: double.infinity,
           decoration: BoxDecoration(
             color: Colors.white.withOpacity(0.4),
           ),
@@ -67,32 +70,82 @@ class HourlyForecastScreen extends StatelessWidget {
             elevation: 5.0,
             color: Colors.transparent,
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(100.0),
+              borderRadius: BorderRadius.circular(0),
             ),
             child: Padding(
-              padding: const EdgeInsets.only(bottom: 1.0),
+              padding: const EdgeInsets.only(bottom: 10.0),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Text('Today',
-                      style: TextStyle(color: Colors.white, fontSize: 24.0)),
                   const SizedBox(height: 8.0),
                   Text(
-                    '${hourlyWeather.time.hour}:${hourlyWeather.time.minute}0',
+                    '${hourlyForecast.first.time.hour}:${hourlyForecast.first.time.minute}0',
                     style: const TextStyle(color: Colors.white, fontSize: 24.0),
                   ),
                   const SizedBox(height: 8.0),
-                  Image.network("http:${hourlyWeather.icon}"),
+                  Image.network("http:${hourlyForecast.first.icon}"),
                   Text(
-                    '${hourlyWeather.temperature} °C',
+                    '${hourlyForecast.first.temperature} °C',
                     style: const TextStyle(color: Colors.white, fontSize: 24.0),
                   ),
                 ],
               ),
             ),
           ),
-        );
-      },
+        ),
+        // ListView of coming hours
+        Expanded(
+          child: ListView.builder(
+            scrollDirection: Axis.horizontal,
+            itemCount: upcomingForecast.length,
+            itemBuilder: (context, index) {
+              HourlyWeather hourlyWeather = upcomingForecast[index];
+
+              return Container(
+                width: 200.0,
+                height: 50.0,
+                // padding: const EdgeInsets.all(8.0),
+                decoration: BoxDecoration(
+                  color: Colors.white.withOpacity(0.4),
+                ),
+                child: Card(
+                  elevation: 5.0,
+                  color: Colors.transparent,
+                  // margin: const EdgeInsets.only(
+                  //     left: 0.0, top: 24.0, right: 0.0, bottom: 24.0),
+                  // shape: RoundedRectangleBorder(
+                  //   borderRadius: BorderRadius.circular(40.0),
+                  // ),
+                  child: Padding(
+                    padding: const EdgeInsets.only(bottom: 10.0),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          '${hourlyWeather.time.hour}:${hourlyWeather.time.minute}0',
+                          style: const TextStyle(
+                              color: Colors.white, fontSize: 24.0),
+                        ),
+                        const SizedBox(height: 8.0),
+                        Image.network(
+                          "http:${hourlyWeather.icon}",
+                          height: 60,
+                          width: 60,
+                        ),
+                        Text(
+                          '${hourlyWeather.temperature} °C',
+                          style: const TextStyle(
+                              color: Colors.white, fontSize: 24.0),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              );
+            },
+          ),
+        ),
+      ],
     );
   }
 }

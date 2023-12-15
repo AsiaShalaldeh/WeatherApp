@@ -1,13 +1,16 @@
 class City {
-  int? id;
+  final int id;
   final String cityName;
   final String cityImage;
+  String? longitude;
+  String? latitude;
 
-  City({
-    required this.cityName,
-    required this.cityImage,
-    required id,
-  });
+  City(
+      {required this.cityName,
+      required this.cityImage,
+      required this.id,
+      this.longitude,
+      this.latitude});
 
   factory City.fromJson(Map<String, dynamic> json) {
     return City(

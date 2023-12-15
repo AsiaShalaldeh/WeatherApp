@@ -45,8 +45,8 @@ class WeatherService {
 
   Future<List<Weather>> fetchWeatherForCities() async {
     try {
-      // final List<City> cities = await loadCities();
-      final List<City> cities = await DatabaseProvider.instance.getAllCities();
+      final List<City> cities = await loadCities();
+      // final List<City> cities = await DatabaseProvider.instance.getAllCities();
       final List<Weather> weatherDataList = [];
 
       for (final city in cities) {

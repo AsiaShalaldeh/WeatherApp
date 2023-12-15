@@ -27,8 +27,9 @@ class DatabaseProvider extends ChangeNotifier {
       path,
       version: version,
       onCreate: (Database db, int version) async {
-        await createCityTable(db);
+        // await createCityTable(db);
         await createUserPreferencesTable(db);
+        // await insertMultipleCities(db);
       },
       onUpgrade: (Database db, int oldVersion, int newVersion) {
         // Implement upgrade logic if needed
@@ -36,25 +37,41 @@ class DatabaseProvider extends ChangeNotifier {
     );
   }
 
-  Future<void> createCityTable(Database db) async {
-    await db.execute('''
-    CREATE TABLE cities (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      city_name TEXT,
-      city_image TEXT
-    )
-  ''');
-  }
+  // Future<void> insertMultipleCities(Database db) async {
+  //   final List<Map<String, dynamic>> cities = [
+  //     {
+  //       'id': 0,
+  //       'city_name': 'London',
+  //       'city_image': 'assets/images/london.jpg'
+  //     },
+  //   ];
+  //   Batch batch = db.batch();
+  //   for (var city in cities) {
+  //     batch.insert('cities', city);
+  //   }
+  //   await batch.commit();
+  // }
+
+  // Future<void> createCityTable(Database db) async {
+  //   await db.execute('''
+  //   CREATE TABLE cities (
+  //     id INTEGER PRIMARY KEY NOT NULL AUTOINCREMENT,
+  //     city_name TEXT,
+  //     city_image TEXT
+  //   )
+  // ''');
+  // }
 
   Future<void> createUserPreferencesTable(Database db) async {
     await db.execute('''
     CREATE TABLE preferences (
-      selected_city_id INTEGER PRIMARY KEY,
-      FOREIGN KEY (selected_city_id) REFERENCES cities (id)
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      city_name TEXT
     )
   ''');
   }
 
+  // FOREIGN KEY (city_name) REFERENCES cities (city_name)
   void insertCity(City city) async {
     final db = await database;
     await db.insert('cities', city.toMap());
@@ -64,6 +81,17 @@ class DatabaseProvider extends ChangeNotifier {
   void deleteCity(int id) async {
     final db = await database;
     db.delete('cities', where: 'id=?', whereArgs: [id]);
+    notifyListeners();
+  }
+
+  void updateCity(String name) async {
+    final db = await database;
+    await db.update(
+      'cities',
+      {'id': 1},
+      where: 'city_name = ?',
+      whereArgs: [name],
+    );
     notifyListeners();
   }
 
@@ -78,16 +106,31 @@ class DatabaseProvider extends ChangeNotifier {
     return cities;
   }
 
-  void insertPreference(Preference preference) async {
+  Future<void> insertPreference(Preference preference) async {
     final db = await database;
-    await db.insert('preferences', preference.toMap());
+    try {
+      await db.insert('preferences', preference.toMap());
+      print('Insert success: $preference');
+      notifyListeners();
+    } catch (e) {
+      print('Insert error: $e');
+    }
+  }
+
+  Future<void> deletePreference(String cityName) async {
+    final db = await database;
+    db.delete('preferences', where: 'city_name=?', whereArgs: [cityName]);
     notifyListeners();
   }
 
-  void deletePreference(int id) async {
-    final db = await database;
-    db.delete('preferences', where: 'id=?', whereArgs: [id]);
-    notifyListeners();
+  Future<bool> isFavorite(String cityName) async {
+    try {
+      final preferences = await DatabaseProvider.instance.getUserPreferences();
+      return preferences.any((preference) => preference.cityName == cityName);
+    } catch (error) {
+      print('Error checking favorite status: $error');
+      return false;
+    }
   }
 
   Future<List<Preference>> getUserPreferences() async {
