@@ -47,21 +47,6 @@ class _FavoritePlacesScreenState extends State<FavoritePlacesScreen> {
     return cities;
   }
 
-  Future<void> _addFavoritePlace(String cityName) async {
-    await DatabaseProvider.instance
-        .insertPreference(Preference(cityName: cityName));
-    setState(() {
-      favoritePlaces = _loadFavoritePlaces();
-    });
-  }
-
-  Future<void> _deleteFavoritePlace(int id) async {
-    // await DatabaseProvider.instance.deletePreference(id);
-    setState(() {
-      favoritePlaces = _loadFavoritePlaces();
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -86,7 +71,7 @@ class _FavoritePlacesScreenState extends State<FavoritePlacesScreen> {
             );
           } else if (!snapshot.hasData || (snapshot.data as List).isEmpty) {
             return const Center(
-              child: Text('No favorite places found.'),
+              child: Text('No Favorite Places Found!'),
             );
           } else {
             List<City> data = snapshot.data as List<City>;

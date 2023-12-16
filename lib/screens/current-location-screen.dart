@@ -1,6 +1,12 @@
+import 'package:current_location/current_location.dart';
+import 'package:current_location/model/location.dart';
 import 'package:flutter/material.dart';
-import 'package:geocoding/geocoding.dart';
-import 'package:geolocator/geolocator.dart';
+import 'package:weatherapp/widgets/weather-landing.dart';
+
+import '../models/city.dart';
+import '../models/weather.dart';
+import '../services/weather_service.dart';
+import '../widgets/back-arrow-button.dart';
 
 class CurrentLocationScreen extends StatefulWidget {
   const CurrentLocationScreen({Key? key}) : super(key: key);
@@ -10,103 +16,83 @@ class CurrentLocationScreen extends StatefulWidget {
 }
 
 class _CurrentLocationScreenState extends State<CurrentLocationScreen> {
-  String? _currentAddress;
-  Position? _currentPosition;
-  // WeatherFactory wf = new WeatherFactory("YOUR_API_KEY");
+  late Future<Weather> weatherData;
+  late City currentCity;
 
-  Future<bool> _handleLocationPermission() async {
-    bool serviceEnabled;
-    LocationPermission permission;
-
-    serviceEnabled = await Geolocator.isLocationServiceEnabled();
-    if (!serviceEnabled) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-          content: Text(
-              'Location services are disabled. Please enable the services')));
-      return false;
-    }
-    permission = await Geolocator.checkPermission();
-    if (permission == LocationPermission.denied) {
-      permission = await Geolocator.requestPermission();
-      if (permission == LocationPermission.denied) {
-        ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Location permissions are denied')));
-        return false;
-      }
-    }
-    if (permission == LocationPermission.deniedForever) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-          content: Text(
-              'Location permissions are permanently denied, we cannot request permissions.')));
-      return false;
-    }
-    return true;
+  @override
+  void initState() {
+    super.initState();
+    weatherData = _fetchWeatherData();
   }
 
-  Future<void> _getCurrentPosition() async {
-    final hasPermission = await _handleLocationPermission();
-
-    if (!hasPermission) return;
-
+  Future<Weather> _fetchWeatherData() async {
     try {
-      Position position = await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.high,
-      );
-      setState(() {
-        _currentPosition = position;
-      });
-
-      // Now that we have the position, call the address method
-      await _getAddressFromLatLng(_currentPosition!);
-    } catch (e) {
-      debugPrint(e.toString());
-    }
-  }
-
-  Future<void> _getAddressFromLatLng(Position position) async {
-    try {
-      List<Placemark> placemarks =
-          await placemarkFromCoordinates(31.532570, 35.099827
-              // position.latitude,
-              // position.longitude,
-              );
-
-      print(placemarks);
-
-      if (placemarks.isNotEmpty) {
-        Placemark place = placemarks[0];
-        setState(() {
-          _currentAddress = '${place.locality}';
-        });
+      final Location location = await UserLocation.getValue() as Location;
+      final String regionName = location.regionName ?? '';
+      if (regionName.isNotEmpty) {
+        final response = await WeatherService().fetchWeatherData(regionName);
+        final List<City> cities = await WeatherService().loadCities();
+        currentCity = cities.firstWhere((c) => c.cityName == regionName);
+        return Weather.fromJson(response, currentCity);
       } else {
-        setState(() {
-          _currentAddress = 'No address available';
-        });
+        throw Exception('Region name is empty');
       }
     } catch (e) {
-      debugPrint(e.toString());
+      throw Exception('Failed to load weather data: $e');
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Location Page")),
-      body: SafeArea(
-        child: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text('LAT: ${_currentPosition?.latitude ?? ""}'),
-              Text('LNG: ${_currentPosition?.longitude ?? ""}'),
-              Text('ADDRESS: ${_currentAddress ?? ""}'),
-              const SizedBox(height: 32),
-              ElevatedButton(
-                onPressed: _getCurrentPosition,
-                child: const Text("Get Current Location"),
-              )
-            ],
-          ),
+      backgroundColor: Colors.white,
+      body: Center(
+        child: FutureBuilder<Weather>(
+          future: weatherData,
+          builder: (BuildContext context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const CircularProgressIndicator(
+                color: Colors.green,
+              );
+            } else if (snapshot.hasError) {
+              return Text('Error: ${snapshot.error}');
+            } else if (snapshot.hasData) {
+              return Container(
+                decoration: BoxDecoration(
+                  image: snapshot.data!.city.cityImage != null
+                      ? DecorationImage(
+                          image: AssetImage(snapshot.data!.city.cityImage!),
+                          fit: BoxFit.cover,
+                        )
+                      : null,
+                ),
+                child: Stack(
+                  children: [
+                    WeatherLanding(
+                      weather: snapshot.data!,
+                    ),
+                    BackArrowButton(onPressed: () {
+                      Navigator.pop(context);
+                    }),
+                    // Add an icon or any other visual element to indicate current location
+                    const Positioned(
+                      top: 250,
+                      right: 180,
+                      child: Icon(
+                        Icons.location_pin,
+                        color: Colors.orange,
+                        size: 32,
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            } else {
+              return const Text(
+                'We Can not Return the Weather of your Location, Come Back Again!',
+              );
+            }
+          },
         ),
       ),
     );

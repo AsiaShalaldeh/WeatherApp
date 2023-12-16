@@ -7,6 +7,8 @@ import 'package:weatherapp/screens/places_screen.dart';
 import 'package:weatherapp/services/weather_service.dart';
 
 import '../providers/selected-city-provider.dart';
+import '../widgets/menu-button.dart';
+import '../widgets/weather-landing.dart';
 import 'current-location-screen.dart';
 import 'daily-forecast-screen.dart';
 import 'favorite-places-screen.dart';
@@ -19,6 +21,8 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+
   late Future<Weather> weatherData;
   late String selectedCityName;
   late City selectedCity;
@@ -36,7 +40,6 @@ class _HomeScreenState extends State<HomeScreen> {
       final response =
           await WeatherService().fetchWeatherData(selectedCityName);
       final List<City> cities = await WeatherService().loadCities();
-      // final List<City> cities = await DatabaseProvider.instance.getAllCities();
       selectedCity = cities.firstWhere((c) => c.cityName == selectedCityName);
       return Weather.fromJson(response, selectedCity);
     } catch (e) {
@@ -47,22 +50,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Weather App', style: TextStyle(color: Colors.black)),
-        leading: Builder(
-          builder: (BuildContext context) {
-            return IconButton(
-              onPressed: () {
-                Scaffold.of(context).openDrawer();
-              },
-              icon: const Icon(
-                Icons.menu,
-                color: Colors.black,
-              ),
-            );
-          },
-        ),
-      ),
+      key: _scaffoldKey,
       drawer: Drawer(
         child: ListView(
           padding: EdgeInsets.zero,
@@ -147,7 +135,6 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       body: Consumer<SelectedCityProvider>(
         builder: (context, selectedCityProvider, child) {
-          final selectedCity = selectedCityProvider.selectedCity;
           return FutureBuilder<Weather>(
             future: _fetchWeatherData(),
             builder: (context, snapshot) {
@@ -164,7 +151,6 @@ class _HomeScreenState extends State<HomeScreen> {
                 final City city = weather.city;
 
                 return Container(
-                  constraints: const BoxConstraints.expand(),
                   decoration: BoxDecoration(
                     image: city.cityImage != null
                         ? DecorationImage(
@@ -172,62 +158,22 @@ class _HomeScreenState extends State<HomeScreen> {
                             fit: BoxFit.cover,
                           )
                         : null,
-                    color: Colors.black.withOpacity(0.1),
                   ),
-                  child: _buildWeatherUI(weather),
+                  child: Stack(
+                    children: [
+                      WeatherLanding(weather: weather),
+                      MenuButton(
+                        scaffoldKey: _scaffoldKey,
+                      ),
+                    ],
+                  ),
                 );
               } else {
-                return const Center(child: Text('No data available.'));
+                return const Center(child: Text('No Data Available!'));
               }
             },
           );
         },
-      ),
-    );
-  }
-
-  Widget _buildWeatherUI(Weather weather) {
-    return Container(
-      margin: const EdgeInsets.all(48.0),
-      decoration: BoxDecoration(
-        color: Colors.black.withOpacity(0.1),
-        shape: BoxShape.circle,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.5),
-            spreadRadius: 2,
-            blurRadius: 5,
-            offset: const Offset(0, 3),
-          ),
-        ],
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(1.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(
-              weather.city.cityName,
-              style: const TextStyle(fontSize: 18.0, color: Colors.white),
-            ),
-            const SizedBox(height: 8.0),
-            Image.network(
-              "http:${weather.icon}",
-              height: 48.0,
-              width: 48.0,
-            ),
-            const SizedBox(height: 8.0),
-            Text(
-              '${weather.temperature} °C',
-              style: const TextStyle(fontSize: 18.0, color: Colors.white),
-            ),
-            const SizedBox(height: 8.0),
-            Text(
-              weather.condition,
-              style: const TextStyle(fontSize: 18.0, color: Colors.white),
-            ),
-          ],
-        ),
       ),
     );
   }

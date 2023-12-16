@@ -20,6 +20,7 @@ class MoreInformationScreen extends StatefulWidget {
 
 class _MoreInformationScreenState extends State<MoreInformationScreen> {
   late Future<DetailedCityWeather> detailedCityWeather;
+  late Weather weather;
 
   @override
   void initState() {
