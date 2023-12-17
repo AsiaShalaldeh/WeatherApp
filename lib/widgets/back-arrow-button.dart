@@ -10,7 +10,7 @@ class BackArrowButton extends StatelessWidget {
     return Align(
       alignment: Alignment.topLeft,
       child: Padding(
-        padding: const EdgeInsets.only(top: 30.0, left: 10.0),
+        padding: const EdgeInsets.only(top: 30.0, left: 0.0),
         child: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.white),
           onPressed: onPressed,

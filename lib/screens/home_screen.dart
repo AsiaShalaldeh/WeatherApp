@@ -119,14 +119,14 @@ class _HomeScreenState extends State<HomeScreen> {
               },
             ),
             ListTile(
-              leading: const Icon(Icons.my_location),
+              leading: const Icon(Icons.location_pin),
               title: const Text('Current Location'),
               onTap: () {
                 Navigator.pop(context);
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (context) => CurrentLocationScreen()),
+                      builder: (context) => const CurrentLocationScreen()),
                 );
               },
             ),
@@ -141,7 +141,7 @@ class _HomeScreenState extends State<HomeScreen> {
               if (snapshot.connectionState == ConnectionState.waiting) {
                 return const Center(
                   child: CircularProgressIndicator(
-                    color: Colors.blue,
+                    color: Colors.green,
                   ),
                 );
               } else if (snapshot.hasError) {

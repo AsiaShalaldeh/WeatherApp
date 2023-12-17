@@ -62,7 +62,6 @@ class _PlacesScreenState extends State<PlacesScreen> {
                     itemCount: cityWeather.length,
                     itemBuilder: (context, index) {
                       Weather weatherOfCity = cityWeather[index];
-                      // return _buildCityCard(weatherOfCity);
                       return CityCard(weatherOfCity: weatherOfCity);
                     },
                   ),

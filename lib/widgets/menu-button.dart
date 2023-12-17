@@ -9,7 +9,7 @@ class MenuButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return Positioned(
       top: 30.0,
-      left: 5.0,
+      left: 0.0,
       child: IconButton(
         onPressed: () {
           scaffoldKey.currentState?.openDrawer();

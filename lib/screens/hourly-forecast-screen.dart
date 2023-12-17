@@ -26,7 +26,10 @@ class HourlyForecastScreen extends StatelessWidget {
         future: _fetchHourlyForecastData(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
+            return const Center(
+                child: CircularProgressIndicator(
+              color: Colors.green,
+            ));
           } else if (snapshot.hasError) {
             return Center(child: Text('Error: ${snapshot.error}'));
           } else {
@@ -50,6 +53,8 @@ class HourlyForecastScreen extends StatelessWidget {
 
   Widget BuildHourlyForecastUI(
       BuildContext context, List<HourlyWeather> hourlyForecast) {
+    print('Helooooooooooooooo');
+    // print(currentHour);
     final HourlyWeather currentHourWeather = hourlyForecast
         .where((hourlyWeather) =>
             hourlyWeather.time.hour == hourlyWeather.currentTime.hour)
@@ -107,7 +112,6 @@ class HourlyForecastScreen extends StatelessWidget {
               itemCount: upcomingForecast.length,
               itemBuilder: (context, index) {
                 HourlyWeather hourlyWeather = upcomingForecast[index];
-                print(hourlyWeather.temperature);
                 return HourlyWeatherTile(hourlyWeather: hourlyWeather);
               },
             ),

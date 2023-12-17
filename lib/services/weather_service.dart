@@ -67,7 +67,8 @@ class WeatherService {
     try {
       final response = await fetchDailyForecast(cityName);
       final cityWeather = await fetchWeatherData(cityName);
-      final currentTime = cityWeather['location']['localtime'];
+      final currentTime = cityWeather['current']['last_updated'];
+      print(currentTime);
       final List<HourlyWeather> hourlyForecast =
           (response['forecast']['forecastday'][0]['hour'] as List)
               .map((hourData) => HourlyWeather.fromJson(hourData, currentTime))

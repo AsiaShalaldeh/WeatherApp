@@ -1,51 +1,72 @@
-// import 'package:flutter/material.dart';
-// import 'package:google_maps_flutter/google_maps_flutter.dart';
-//
-// import '../models/city.dart';
-// import '../models/day-weather.dart';
-//
-// class WeatherMapScreen extends StatelessWidget {
-//   final City city;
-//   final DayWeather dayWeather;
-//
-//   const WeatherMapScreen(
-//       {Key? key, required this.dayWeather, required this.city})
-//       : super(key: key);
-//
-//   @override
-//   Widget build(BuildContext context) {
-//     // double? latitude = double.tryParse(dayWeather.latitude);
-//     // double? longitude = double.tryParse(dayWeather.longitude);
-//
-//     if (dayWeather.latitude != null && dayWeather.longitude != null) {
-//       return Scaffold(
-//         appBar: AppBar(
-//           title: Text('Weather Map - ${city.cityName}'),
-//         ),
-//         body: GoogleMap(
-//           initialCameraPosition: CameraPosition(
-//             target: LatLng(dayWeather.latitude, dayWeather.longitude),
-//             zoom: 12,
-//           ),
-//           markers: {
-//             Marker(
-//               markerId: MarkerId(city.cityName),
-//               position: LatLng(dayWeather.latitude, dayWeather.longitude),
-//               infoWindow: InfoWindow(title: city.cityName),
-//             ),
-//           },
-//         ),
-//       );
-//     } else {
-//       return Scaffold(
-//         appBar: AppBar(
-//           title: const Text('Error'),
-//         ),
-//         body: Center(
-//           child:
-//               Text('Invalid latitude or longitude values for ${city.cityName}'),
-//         ),
-//       );
-//     }
-//   }
-// }
+import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:syncfusion_flutter_maps/maps.dart';
+
+import '../widgets/back-arrow-button.dart';
+
+class WeatherMapScreen extends StatefulWidget {
+  final double latitude;
+  final double longitude;
+
+  const WeatherMapScreen({
+    Key? key,
+    required this.latitude,
+    required this.longitude,
+  }) : super(key: key);
+
+  @override
+  State<WeatherMapScreen> createState() => _WeatherMapScreenState();
+}
+
+class _WeatherMapScreenState extends State<WeatherMapScreen> {
+  Position? position;
+  final openStreamMap = 'https://tile.openstreetmap.org/{z}/{x}/{y}.png';
+  final azureMap =
+      'https://atlas.microsoft.com/map/imagery/png?subscription-key=cGa7L0uUNMtWSynLLodATxxh7A8HDJvYX8dv29TUhJ0&api-version=1.0&style=satellite&zoom={z}&x={x}&y={y}';
+
+  @override
+  void initState() {
+    super.initState();
+    _getCurrentLocation();
+  }
+
+  Future<Position?> _getCurrentPosition() async {
+    try {
+      return await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high,
+      );
+    } catch (e) {
+      return null;
+    }
+  }
+
+  Future<void> _getCurrentLocation() async {
+    Position? currentPosition = await _getCurrentPosition();
+    setState(() {
+      position = currentPosition;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Stack(
+        children: [
+          SfMaps(
+            layers: [
+              MapTileLayer(
+                urlTemplate: azureMap,
+                initialFocalLatLng:
+                    MapLatLng(widget.latitude, widget.longitude),
+                initialZoomLevel: 15,
+              ),
+            ],
+          ),
+          BackArrowButton(onPressed: () {
+            Navigator.pop(context);
+          }),
+        ],
+      ),
+    );
+  }
+}

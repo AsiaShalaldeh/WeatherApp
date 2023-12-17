@@ -1,6 +1,7 @@
 import 'package:current_location/current_location.dart';
 import 'package:current_location/model/location.dart';
 import 'package:flutter/material.dart';
+import 'package:weatherapp/screens/weather-map-screen.dart';
 import 'package:weatherapp/widgets/weather-landing.dart';
 
 import '../models/city.dart';
@@ -18,6 +19,8 @@ class CurrentLocationScreen extends StatefulWidget {
 class _CurrentLocationScreenState extends State<CurrentLocationScreen> {
   late Future<Weather> weatherData;
   late City currentCity;
+  late double latitude;
+  late double longitude;
 
   @override
   void initState() {
@@ -29,6 +32,10 @@ class _CurrentLocationScreenState extends State<CurrentLocationScreen> {
     try {
       final Location location = await UserLocation.getValue() as Location;
       final String regionName = location.regionName ?? '';
+      setState(() {
+        latitude = location.latitude ?? 0.0;
+        longitude = location.longitude ?? 0.0;
+      });
       if (regionName.isNotEmpty) {
         final response = await WeatherService().fetchWeatherData(regionName);
         final List<City> cities = await WeatherService().loadCities();
@@ -74,14 +81,32 @@ class _CurrentLocationScreenState extends State<CurrentLocationScreen> {
                     BackArrowButton(onPressed: () {
                       Navigator.pop(context);
                     }),
-                    // Add an icon or any other visual element to indicate current location
-                    const Positioned(
-                      top: 250,
-                      right: 180,
-                      child: Icon(
-                        Icons.location_pin,
-                        color: Colors.orange,
-                        size: 32,
+                    Align(
+                      alignment: Alignment.bottomRight,
+                      child: Padding(
+                        padding: const EdgeInsets.only(bottom: 120, right: 160),
+                        child: Container(
+                          decoration: const BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: Colors.green,
+                          ),
+                          child: IconButton(
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => WeatherMapScreen(
+                                          longitude: longitude,
+                                          latitude: latitude,
+                                        )),
+                              );
+                            },
+                            icon: const Icon(
+                              Icons.map,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ),
                       ),
                     ),
                   ],
