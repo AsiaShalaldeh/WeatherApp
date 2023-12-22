@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:location/location.dart';
 import 'package:syncfusion_flutter_maps/maps.dart';
 
 import '../widgets/back-arrow-button.dart';
@@ -24,27 +25,12 @@ class _WeatherMapScreenState extends State<WeatherMapScreen> {
   final azureMap =
       'https://atlas.microsoft.com/map/imagery/png?subscription-key=cGa7L0uUNMtWSynLLodATxxh7A8HDJvYX8dv29TUhJ0&api-version=1.0&style=satellite&zoom={z}&x={x}&y={y}';
 
+  LocationData? currentLocation;
+  String address = "";
+
   @override
   void initState() {
     super.initState();
-    _getCurrentLocation();
-  }
-
-  Future<Position?> _getCurrentPosition() async {
-    try {
-      return await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.high,
-      );
-    } catch (e) {
-      return null;
-    }
-  }
-
-  Future<void> _getCurrentLocation() async {
-    Position? currentPosition = await _getCurrentPosition();
-    setState(() {
-      position = currentPosition;
-    });
   }
 
   @override

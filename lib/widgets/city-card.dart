@@ -52,8 +52,6 @@ class _CityCardState extends State<CityCard> {
       child: Stack(
         children: [
           Column(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               ListTile(
                 title: Text(
@@ -73,8 +71,8 @@ class _CityCardState extends State<CityCard> {
             ],
           ),
           Positioned(
-            top: 8.0,
-            right: 8.0,
+            top: -5.0,
+            right: 5.0,
             child: FutureBuilder<bool>(
               future: DatabaseProvider.instance
                   .isFavorite(widget.weatherOfCity.city.cityName),
@@ -105,7 +103,7 @@ class _CityCardState extends State<CityCard> {
             ),
           ),
           Positioned(
-            bottom: 8.0,
+            bottom: 0.0,
             right: 8.0,
             child: ElevatedButton(
               onPressed: () {

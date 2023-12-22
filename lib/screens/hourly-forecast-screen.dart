@@ -53,8 +53,6 @@ class HourlyForecastScreen extends StatelessWidget {
 
   Widget BuildHourlyForecastUI(
       BuildContext context, List<HourlyWeather> hourlyForecast) {
-    print('Helooooooooooooooo');
-    // print(currentHour);
     final HourlyWeather currentHourWeather = hourlyForecast
         .where((hourlyWeather) =>
             hourlyWeather.time.hour == hourlyWeather.currentTime.hour)

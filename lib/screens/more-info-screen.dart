@@ -78,7 +78,6 @@ class _MoreInformationScreenState extends State<MoreInformationScreen> {
                     padding: const EdgeInsets.all(16.0),
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
                         Text(
                           widget.cityWeather.city.cityName,
@@ -158,7 +157,7 @@ class _MoreInformationScreenState extends State<MoreInformationScreen> {
                             ),
                           ],
                         ),
-                        const SizedBox(height: 16.0),
+                        const SizedBox(height: 24.0),
                         InkWell(
                           onTap: () {
                             Navigator.pop(context);

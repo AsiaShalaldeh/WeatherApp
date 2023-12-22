@@ -1,7 +1,8 @@
-import 'package:current_location/current_location.dart';
-import 'package:current_location/model/location.dart';
 import 'package:flutter/material.dart';
+import 'package:geocode/geocode.dart';
+import 'package:location/location.dart';
 import 'package:weatherapp/screens/weather-map-screen.dart';
+import 'package:weatherapp/services/location-service.dart';
 import 'package:weatherapp/widgets/weather-landing.dart';
 
 import '../models/city.dart';
@@ -17,32 +18,53 @@ class CurrentLocationScreen extends StatefulWidget {
 }
 
 class _CurrentLocationScreenState extends State<CurrentLocationScreen> {
-  late Future<Weather> weatherData;
+  late Future<Weather>? weatherData = null;
   late City currentCity;
   late double latitude;
   late double longitude;
+  LocationData? locationData;
+  Address? address;
+  String cityName = "";
 
   @override
   void initState() {
     super.initState();
-    weatherData = _fetchWeatherData();
+    _getLocationAndFetchWeatherData();
+  }
+
+  Future<void> _getLocationAndFetchWeatherData() async {
+    await _getLocation();
+    setState(() {
+      weatherData = _fetchWeatherData();
+    });
+  }
+
+  Future<void> _getLocation() async {
+    try {
+      locationData = await LocationService().GetLocation();
+      address = await LocationService().GetAddress(
+        locationData?.latitude,
+        locationData?.longitude,
+      );
+      setState(() {
+        latitude = locationData!.latitude ?? 0.0;
+        longitude = locationData!.longitude ?? 0.0;
+        cityName = address?.city ?? "";
+      });
+    } catch (e) {
+      print('Error getting location: $e');
+    }
   }
 
   Future<Weather> _fetchWeatherData() async {
     try {
-      final Location location = await UserLocation.getValue() as Location;
-      final String regionName = location.regionName ?? '';
-      setState(() {
-        latitude = location.latitude ?? 0.0;
-        longitude = location.longitude ?? 0.0;
-      });
-      if (regionName.isNotEmpty) {
-        final response = await WeatherService().fetchWeatherData(regionName);
+      if (locationData != null && cityName.isNotEmpty) {
+        final response = await WeatherService().fetchWeatherData(cityName);
         final List<City> cities = await WeatherService().loadCities();
-        currentCity = cities.firstWhere((c) => c.cityName == regionName);
+        currentCity = cities.firstWhere((c) => c.cityName == cityName);
         return Weather.fromJson(response, currentCity);
       } else {
-        throw Exception('Region name is empty');
+        throw Exception('Location data or city name is not available');
       }
     } catch (e) {
       throw Exception('Failed to load weather data: $e');
@@ -57,7 +79,8 @@ class _CurrentLocationScreenState extends State<CurrentLocationScreen> {
         child: FutureBuilder<Weather>(
           future: weatherData,
           builder: (BuildContext context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
+            if (snapshot.data == null ||
+                snapshot.connectionState == ConnectionState.waiting) {
               return const CircularProgressIndicator(
                 color: Colors.green,
               );
@@ -84,7 +107,7 @@ class _CurrentLocationScreenState extends State<CurrentLocationScreen> {
                     Align(
                       alignment: Alignment.bottomRight,
                       child: Padding(
-                        padding: const EdgeInsets.only(bottom: 120, right: 160),
+                        padding: const EdgeInsets.only(bottom: 120, right: 165),
                         child: Container(
                           decoration: const BoxDecoration(
                             shape: BoxShape.circle,
@@ -109,6 +132,14 @@ class _CurrentLocationScreenState extends State<CurrentLocationScreen> {
                         ),
                       ),
                     ),
+                    Positioned(
+                      top: 365,
+                      left: 138,
+                      child: Text(
+                        '${address?.streetAddress}',
+                        style: TextStyle(color: Colors.white),
+                      ),
+                    )
                   ],
                 ),
               );

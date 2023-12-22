@@ -18,13 +18,13 @@ class FavoritePlacesScreen extends StatefulWidget {
 
 class _FavoritePlacesScreenState extends State<FavoritePlacesScreen> {
   late Future<List<City>> favoritePlaces;
-  late Future<List<Weather>> cities;
+  late Future<List<Weather>> citiesWeather;
 
   @override
   void initState() {
     super.initState();
     favoritePlaces = _loadFavoritePlaces();
-    cities = _fetchCitiesData();
+    citiesWeather = _fetchCitiesData();
   }
 
   Future<List<Weather>> _fetchCitiesData() async {
@@ -114,7 +114,7 @@ class _FavoritePlacesScreenState extends State<FavoritePlacesScreen> {
                         ),
                       ),
                       FutureBuilder<List<Weather>>(
-                        future: cities,
+                        future: citiesWeather,
                         builder: (context, snapshot) {
                           if (snapshot.connectionState ==
                               ConnectionState.waiting) {

@@ -10,7 +10,6 @@ class WeatherLanding extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.black.withOpacity(0.1),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.5),
@@ -33,7 +32,7 @@ class WeatherLanding extends StatelessWidget {
                   color: Colors.white,
                 ),
               ),
-              const SizedBox(height: 8.0),
+              const SizedBox(height: 24.0),
               Image.network(
                 "http:${weather.icon}",
                 height: 48.0,
