@@ -20,9 +20,7 @@ This Flutter Weather App is a mobile application designed to provide users with 
 ```
 git clone https://github.com/AsiaShalaldeh/WeatherApp.git
 ```
-
-2. Obtain an API key from WeatherAPI and replace YOUR_API_KEY in the code with your actual API key.
-3. Run the app:
+2. Run the app:
 ```
 flutter run
 ```
